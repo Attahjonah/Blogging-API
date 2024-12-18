@@ -1,7 +1,7 @@
 const BlogModel = require('../models/blogModel')
 
 // Create Blog
-const CreateBlog = async ({text, user}) => {
+const CreateBlog = async (text, user) => {
     const blog = await BlogModel.create({
         text,
         user_id: user._id,

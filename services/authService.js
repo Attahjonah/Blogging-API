@@ -2,17 +2,17 @@ const UserModel = require('../models/userModel')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const Signup = async ({ firstName, lastName, password, email }) => {
+const Signup = async ( firstName, lastName, email, password ) => {
 
     try {
         const newUser = await UserModel.create({
-            firstName,
-            lastName,
-            email,
-            password
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password
         })
     
-        const token = await jwt.sign({ email }, process.env.SECRET_KEY );
+        const token =  jwt.sign({ email }, process.env.SECRET_KEY );
     
         return {
             code: 201,
@@ -24,6 +24,8 @@ const Signup = async ({ firstName, lastName, password, email }) => {
             }
         }  
     } catch (error) {
+        console.log(error) ;
+        
         return {
             code: 500,
             success: false,
@@ -36,7 +38,7 @@ const Signup = async ({ firstName, lastName, password, email }) => {
     
 }
 
-const Login = async ({ email, password }) => {
+const Login = async ( email, password ) => {
 
     try {
         const user = await UserModel.findOne({ email });
