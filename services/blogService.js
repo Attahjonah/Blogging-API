@@ -1,5 +1,5 @@
 const BlogModel = require('../models/blogModel')
-const { default: calculateReadingTime }  = require('../utils/calculateReadingTime')
+const  calculateReadingTime   = require('../utils/calculateReadingTime')
 
 
 // Create Blog
@@ -25,8 +25,8 @@ const CreateBlog = async (payload, user) => {
 
 }
 // Get Published Blog by ID
-const GetBlog = async ({ blogId }) => {
-    const blog = await BlogModel.findById({ _id: blogId }).populate("author", "firstName", "lastName", "email").exec();
+const GetBlog = async ( blogId ) => {
+    const blog = await BlogModel.findById(blogId).populate("author", "firstName lastName email").exec();
 
     if (!blog) {
         return {

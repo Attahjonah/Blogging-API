@@ -6,7 +6,7 @@ const validatingBlogCreated = async function (req, res, next){
         title: Joi.string().required().min(5).max(100),
         description: Joi.string().required().min(10).max(250),
         body: Joi.string().required().min(50),
-        readingTime: Joi.number().min(1).max(120).required(),
+        author: Joi.string().required(),
         tags: Joi.array()
                 .items(Joi.string().min(2).max(30))
                 .max(10)

@@ -31,9 +31,9 @@ const BlogSchema = new mongoose.Schema({
         default: 0 
     },
 
-    reading_time: { type: Number },
+    reading_time: { type: String },
 
-    tags: { type: String },
+    tags: { type: [String] },
 
     body: { 
         type: String, 
