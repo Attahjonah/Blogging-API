@@ -1,12 +1,18 @@
 const BlogModel = require('../models/blogModel')
+const { default: calculateReadingTime }  = require('../utils/calculateReadingTime')
+
 
 // Create Blog
-const CreateBlog = async (text, user) => {
+const CreateBlog = async (payload, user) => {
+    const { body } = payload;
+    const reading_time = calculateReadingTime(body);
     const blog = await BlogModel.create({
-        text,
-        user_id: user._id,
-        created_at: new Date()
-    })
+      ...payload,
+      reading_time,
+      user_id: user._id,
+    });
+  
+    
 
     return {
         code: 201,
@@ -16,11 +22,11 @@ const CreateBlog = async (text, user) => {
             blog,
         }
     }
-}
 
+}
 // Get Published Blog by ID
 const GetBlog = async ({ blogId }) => {
-    const post = await BlogModel.findOne({ _id: blogId });
+    const blog = await BlogModel.findById({ _id: blogId }).populate("author", "firstName", "lastName", "email").exec();
 
     if (!blog) {
         return {
@@ -30,6 +36,8 @@ const GetBlog = async ({ blogId }) => {
             data: null,
         }
     }
+
+    await BlogModel.findByIdAndUpdate(blogId, { $inc: {read_count: 1}})
 
     return {
         code: 200,

@@ -23,6 +23,23 @@ app.get('/', (req, res) =>{
     })
 })
 
+app.use((error, req, res, next) => {
+    console.log("Error Handling Middleware called")
+    console.log('Path: ', req.path)
+    console.error('Error: ', error)
+   
+    if (error.type == 'NOT_FOUND')
+        res.status(500).send(error)
+     else if (error.type == 'Not Found') 
+        res.status(404).send(error)
+    else {
+        res.status(500).send(error)
+    }
+
+    next() 
+})
+
+
 app.get('*', (req,res) =>{
     res.status(404).json({
         message: "Route not found"

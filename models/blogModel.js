@@ -3,10 +3,7 @@ const mongoosePaginate = require('mongoose-paginate-v2')
 
 
 const BlogSchema = new mongoose.Schema({
-    _id: { 
-        type: String 
-    },
-
+    
     title: { 
         type: String, 
         required: true, 

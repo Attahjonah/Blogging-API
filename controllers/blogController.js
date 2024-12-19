@@ -5,7 +5,7 @@ const CreateBlog = async (req, res) => {
     const user = req.user;
 
     const serviceResponse = await BlogService.CreateBlog(
-        payload.text, 
+        payload, 
         user
     )
 
