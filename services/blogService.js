@@ -1,3 +1,4 @@
+const { object } = require('joi');
 const BlogModel = require('../models/blogModel')
 const  calculateReadingTime   = require('../utils/calculateReadingTime')
 
@@ -5,23 +6,37 @@ const  calculateReadingTime   = require('../utils/calculateReadingTime')
 // Create Blog
 const CreateBlog = async (payload, user) => {
     const { body } = payload;
-    const reading_time = calculateReadingTime(body);
-    const blog = await BlogModel.create({
-      ...payload,
-      reading_time,
-      user_id: user._id,
-    });
-  
-    
 
-    return {
-        code: 201,
-        success: true,
-        message: 'Blog created successfully',
-        data: {
-            blog,
+    const reading_time = calculateReadingTime(body);
+
+    try {
+        const blog = await BlogModel.create({
+            ...payload,
+            reading_time,
+            user_id: user._id,
+          })  
+          return {
+            code: 201,
+            success: true,
+            message: 'Blog created successfully',
+            data: {
+                blog,
+            }
+        }
+    
+    } catch (error) {
+        if (error === 11000){
+            const duplicatedField = object.keys(error.keyValue)[0]
+            return {
+                code: 400,
+                success: false,
+                message: 'Duplicate key',
+                data: { message: `$(duplicatedField) already exist`}
+            }
         }
     }
+    ;
+
 
 }
 // Get Published Blog by ID
