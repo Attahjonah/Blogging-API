@@ -25,21 +25,28 @@ const CreateBlog = async (payload, user) => {
         }
     
     } catch (error) {
-        if (error === 11000){
-            const duplicatedField = object.keys(error.keyValue)[0]
+        if (error.code === 11000){
+            const duplicatedField = Object.keys(error.keyValue)[0]
             return {
                 code: 400,
                 success: false,
                 message: 'Duplicate key',
-                data: { message: `$(duplicatedField) already exist`}
+                data: { message: `${duplicatedField} already exist`}
             }
         }
     }
-    ;
+
+    return {
+        code: 404,
+        success: false,
+        message: 'Blog not found',
+        data: null,
+    }
+    
 
 
 }
-// Get Published Blog by ID
+// Get Blog by ID
 const GetBlog = async ( blogId ) => {
     const blog = await BlogModel.findById(blogId).populate("author", "firstName lastName email").exec();
 
@@ -65,7 +72,7 @@ const GetBlog = async ( blogId ) => {
 
 }
 
-// Get published Blogs
+// Get all Blogs
 const GetAllBlog = async () => {
     const blogs = await BlogModel.find();
 
@@ -79,21 +86,43 @@ const GetAllBlog = async () => {
     }
 }
 
-// Update Blog
-const UpdateBlog = async ({ blogId, text, user }) => {
-    const blog = await BlogModel.findOne({ _id: blogId });
+    // Update Blog
+    const UpdateBlog = async ( blogId, payload, user ) => {
+    
+    try {
+        const blog = await BlogModel.findById(blogId);
 
     if (!blog) {
-        return {
+        return { 
             code: 404,
             success: false,
             message: 'Blog not found',
             data: null,
         }
     }
+    // Checking if blog belongs to user
+  
+    if (blog.author._id.toString() !== user._id.toString()){
+        return { 
+            code: 40,
+            success: false,
+            message: 'You are not authorized to update blog',
+            data: null,
+        }
+    }
 
+    // Updating provided payload fields
+    blog.title = payload.title || blog.title
+    blog.description = payload.description || blog.description
+    blog.body = payload.body || blog.body
+    blog.tags = payload.tags || blog.tags
+    blog.state = payload.state || blog.state
 
-    blog.text = text || blog.text
+    // Updating reading time if body is updated
+    if (payload.body){
+        blog.reading_time =calculateReadingTime(payload.body)
+    }
+
     blog.update_at = new Date()
 
     await blog.save()
@@ -106,11 +135,20 @@ const UpdateBlog = async ({ blogId, text, user }) => {
             blog
         },
     }
+    } catch (error) {
+        console.log(error)
+        return {
+            code: 500,
+            success: false,
+            message: 'Error occured while updating the blog',
+            data: null
+        }
+    }
 }
 
 // Deleting a Blog
-const DeleteBlog = async ({ user, blogId }) => {
-    const blog = await BlogModel.findOne({ _id: blogId, user_id: user._id });
+const DeleteBlog = async ( user, blogId ) => {
+    const blog = await BlogModel.findById({ _id: blogId, user_id: user._id });
 
     if (!blog) {
         return {
@@ -122,7 +160,8 @@ const DeleteBlog = async ({ user, blogId }) => {
     }
 
     await blog.deleteOne({
-        _id: blogId, user_id: user._id
+        _id: blogId, 
+        //user_id: user._id
     })
 
     return {

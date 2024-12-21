@@ -32,12 +32,12 @@ const GetAllBlog = async (req, res) => {
 const UpdateBlog = async (req, res) => {
     const blogId = req.params.blogId
     const user = req.user;
-    const text = req.body.text;
+    const payload = req.body;
 
     const serviceResponse = await BlogService.UpdateBlog(
         blogId,
+        payload,
         user,
-        text,
     )
 
     return res.status(serviceResponse.code).json(serviceResponse);

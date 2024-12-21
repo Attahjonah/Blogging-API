@@ -8,7 +8,7 @@ const route = Router()
 route.post('/', BlogMiddleware.validatingBlogCreated, AuthMiddleware.ValidateToken, BlogController.CreateBlog);
 route.get('/:blogId', BlogController.GetBlog);
 route.get('/',  BlogController.GetAllBlog);
-route.patch('/:blogId', AuthMiddleware.ValidateToken, BlogController.UpdateBlog);
+route.put('/:blogId', AuthMiddleware.ValidateToken, BlogController.UpdateBlog);
 route.delete('/:blogId', AuthMiddleware.ValidateToken, BlogController.DeleteBlog);
 
 module.exports = route
