@@ -73,8 +73,30 @@ const GetBlog = async ( blogId ) => {
 }
 
 // Get all Blogs
-const GetAllBlog = async () => {
-    const blogs = await BlogModel.find();
+const GetAllBlog = async ({user_id, text, page = 1, state, tags, perPage = 10}) => {
+
+    const query = {}
+
+    if (user_id) {
+        query.author = user_id
+    }
+
+    if (text) {
+        query.$or = [
+            {title:{$regex: text, $options: 'i'}},
+            {body:{$regex: text, $options: 'i'}}
+        ]
+    }
+
+    if (state) {
+        query.state = state
+    }
+
+    if(tags && Array.isArray(tags) && tags.length > 0) {
+        query.tags = {$in: tags}
+    }
+
+    const blogs = await BlogModel.paginate(query, {page, limit: perPage});
 
     return {
         code: 200,

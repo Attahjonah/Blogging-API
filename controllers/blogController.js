@@ -24,7 +24,10 @@ const GetBlog = async (req, res) => {
 }
 const GetAllBlog = async (req, res) => {
 
-    const serviceResponse = await BlogService.GetAllBlog();
+    const {user_id, text, page = 1, perPage = 10} = req.query;
+    const serviceResponse = await BlogService.GetAllBlog({
+        user_id, text, page, perPage
+    });
 
     return res.status(serviceResponse.code).json(serviceResponse);
 }
